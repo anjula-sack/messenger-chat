@@ -9,7 +9,7 @@
  */
 
 "use strict";
-
+const axios = require("axios");
 const Curation = require("./curation"),
   Order = require("./order"),
   Lead = require("./lead"),
@@ -29,7 +29,7 @@ module.exports = class Receive {
 
   // Check if the event is a message or postback and
   // call the appropriate handler function
-  handleMessage() {
+  async handleMessage() {
     let event = this.webhookEvent;
 
     let responses;
@@ -43,7 +43,7 @@ module.exports = class Receive {
         } else if (message.attachments) {
           responses = this.handleAttachmentMessage();
         } else if (message.text) {
-          responses = this.handleTextMessage();
+          responses = await this.handleTextMessage();
         }
       } else if (event.postback) {
         responses = this.handlePostback();
@@ -74,7 +74,7 @@ module.exports = class Receive {
   }
 
   // Handles messages events with text
-  handleTextMessage() {
+  async handleTextMessage() {
     console.log(
       "Received text:",
       `${this.webhookEvent.message.text} for ${this.user.psid}`
@@ -101,28 +101,25 @@ module.exports = class Receive {
       let care = new Care(this.user, this.webhookEvent);
       response = care.handlePayload("CARE_HELP");
     } else {
-      response = [
-        Response.genText(
-          i18n.__("fallback.any", {
-            message: event.message.text
-          })
-        ),
-        Response.genText(i18n.__("get_started.guidance")),
-        Response.genQuickReply(i18n.__("get_started.help"), [
+      await axios
+        .post(
+          "https://api.openai.com/v1/completions",
           {
-            title: i18n.__("menu.suggestion"),
-            payload: "CURATION"
+            model: "text-davinci-003",
+            prompt: event.message.text,
+            max_tokens: 20,
+            temperature: 0
           },
           {
-            title: i18n.__("menu.help"),
-            payload: "CARE_HELP"
-          },
-          {
-            title: i18n.__("menu.product_launch"),
-            payload: "PRODUCT_LAUNCH"
+            headers: {
+              Authorization: `Bearer ${process.env.CHAT_API_TOKEN}`
+            }
           }
-        ])
-      ];
+        )
+        .then((gptRes) => {
+          console.log("gptRes", gptRes.data.choices);
+          response = [Response.genText(gptRes.data.choices[0].text)];
+        });
     }
 
     return response;
