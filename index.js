@@ -71,13 +71,9 @@ app.post("/webhook", (req, res) => {
   let body = req.body;
 
   console.log(`\u{1F7EA} Received webhook:`);
-  console.dir(body, { depth: null });
 
   // Check if this is an event from a page subscription
   if (body.object === "page") {
-    // Returns a '200 OK' response to all requests
-    res.status(200).send("EVENT_RECEIVED");
-
     // Iterate over each entry - there may be multiple if batched
     body.entry.forEach(async function (entry) {
       if ("changes" in entry) {
@@ -140,7 +136,7 @@ app.post("/webhook", (req, res) => {
                   console.log(JSON.stringify(body));
                   console.log("Profile is unavailable:", error);
                 })
-                .finally(() => {
+                .finally(async () => {
                   console.log("locale: " + user.locale);
                   users[senderPsid] = user;
                   i18n.setLocale("en_US");
@@ -150,7 +146,7 @@ app.post("/webhook", (req, res) => {
                     "with locale:",
                     i18n.getLocale()
                   );
-                  return receiveAndReturn(
+                  return await receiveAndReturn(
                     users[senderPsid],
                     webhookEvent,
                     false
@@ -158,7 +154,11 @@ app.post("/webhook", (req, res) => {
                 });
             } else {
               setDefaultUser(senderPsid);
-              return receiveAndReturn(users[senderPsid], webhookEvent, false);
+              return await receiveAndReturn(
+                users[senderPsid],
+                webhookEvent,
+                false
+              );
             }
           } else {
             i18n.setLocale(users[senderPsid].locale);
@@ -168,15 +168,22 @@ app.post("/webhook", (req, res) => {
               "with locale:",
               i18n.getLocale()
             );
-            return receiveAndReturn(users[senderPsid], webhookEvent, false);
+            return await receiveAndReturn(
+              users[senderPsid],
+              webhookEvent,
+              false
+            );
           }
         } else if (user_ref != null && user_ref != undefined) {
           // Handle user_ref
           setDefaultUser(user_ref);
-          return receiveAndReturn(users[user_ref], webhookEvent, true);
+          return await receiveAndReturn(users[user_ref], webhookEvent, true);
         }
       });
     });
+
+    // Returns a '200 OK' response to all requests
+    res.status(200).send("EVENT_RECEIVED");
   } else {
     // Return a '404 Not Found' if event is not from a page subscription
     res.sendStatus(404);
@@ -201,9 +208,9 @@ function isGuestUser(webhookEvent) {
   return guestUser;
 }
 
-function receiveAndReturn(user, webhookEvent, isUserRef) {
+async function receiveAndReturn(user, webhookEvent, isUserRef) {
   let receiveMessage = new Receive(user, webhookEvent, isUserRef);
-  return receiveMessage.handleMessage();
+  return await receiveMessage.handleMessage();
 }
 
 // Set up your App's Messenger Profile

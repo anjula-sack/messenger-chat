@@ -38,11 +38,7 @@ module.exports = class Receive {
       if (event.message) {
         let message = event.message;
 
-        if (message.quick_reply) {
-          responses = this.handleQuickReply();
-        } else if (message.attachments) {
-          responses = this.handleAttachmentMessage();
-        } else if (message.text) {
+        if (message.text) {
           responses = await this.handleTextMessage();
         }
       } else if (event.postback) {
@@ -101,28 +97,28 @@ module.exports = class Receive {
       let care = new Care(this.user, this.webhookEvent);
       response = care.handlePayload("CARE_HELP");
     } else {
-      await axios
-        .post(
-          "https://api.openai.com/v1/completions",
-          {
-            model: "text-davinci-003",
-            prompt: event.message.text,
-            max_tokens: 20,
-            temperature: 0
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.CHAT_API_TOKEN}`
-            }
+      const gptRes = await axios.post(
+        "https://api.openai.com/v1/completions",
+        {
+          model: "text-davinci-003",
+          prompt: event.message.text,
+          max_tokens: 50,
+          temperature: 0
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.CHAT_API_TOKEN}`
           }
-        )
-        .then((gptRes) => {
-          console.log("gptRes", gptRes.data.choices);
-          response = [Response.genText(gptRes.data.choices[0].text)];
-        });
-    }
+        }
+      );
 
-    return response;
+      console.log("gptRes", gptRes.data.choices);
+      response = [Response.genText(gptRes.data.choices[0].text)];
+    }
+    console.log("====================================");
+    console.log("response", response);
+    console.log("====================================");
+    return await response;
   }
 
   // Handles mesage events with attachments

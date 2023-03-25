@@ -25,7 +25,7 @@ Before you begin, make sure you have completed all of the requirements listed ab
 1. Go to your app Basic Settings, [Find your app here](https://developers.facebook.com/apps)
 2. Save the **App ID** number and the **App Secret**
 
-#### Grant  Messenger access to your Facebook App
+#### Grant Messenger access to your Facebook App
 
 1. Go to your app Dashboard
 2. Under _Add Product_ find _Messenger_ and click _Set Up_
@@ -63,6 +63,7 @@ npm install -g ngrok
 ```
 
 In the directory of this repo, request a tunnel to your local server with your preferred port
+
 ```bash
 ngrok http 3000
 ```
@@ -81,6 +82,7 @@ Forwarding                    https://1c3b838deacb.ngrok.io -> http://localhost:
 Connections                   ttl     opn     rt1     rt5     p50     p90
                               0       0       0.00    0.00    0.00    0.00
 ```
+
 Note the https URL of the external server that is fowarded to your local machine. In the above example, it is `https://1c3b838deacb.ngrok.io`.
 
 #### 2. Install the dependencies
@@ -110,7 +112,7 @@ Edit the `.env` file to add all the values for your app and page. Note that `APP
 #### 4. Run your app locally
 
 ```bash
-node app.js
+node index.js
 ```
 
 You should now be able to access the application in your browser at [http://localhost:3000](http://localhost:3000)
@@ -120,6 +122,7 @@ Confirm that you canalso access it at the external URL from step 1.
 #### 5. Configure your webhook subcription and set the Messenger profile
 
 Use the `VERIFY_TOKEN` that you created in `.env` file and call the **/profile** endpoint in your browser or via cURL:
+
 ```
 http://localhost:3000/profile?mode=all&verify_token=verify-tokenl
 ```
@@ -152,11 +155,11 @@ Note the name given to your app. In this example, it was `mystic-wind-83`.
 
 #### 3. Set your environment variables
 
-On the [Heroku App Dashboard](https://dashboard.heroku.com/), find your app and set up the config vars following the comments in the file ```.sample.env```
+On the [Heroku App Dashboard](https://dashboard.heroku.com/), find your app and set up the config vars following the comments in the file `.sample.env`
 
 Alternatively, you can set env variables from the command line like this:
 
- ```bash
+```bash
 heroku config:set PAGE_ID=XXXX
 ```
 
@@ -173,11 +176,12 @@ heroku logs --tail
 ```
 
 #### 6. Configure your webhook subscription and set the Messenger profile
-  You should now be able to access the application. Use the ```VERIFY_TOKEN``` that you created as a config var and call the **/profile** endpoint on your app like so:
 
-  ```
-  http://<YOUR APP NAME>.herokuapp.com/profile?mode=all&verify_token=<VERIFY_TOKEN>
-  ```
+You should now be able to access the application. Use the `VERIFY_TOKEN` that you created as a config var and call the **/profile** endpoint on your app like so:
+
+```
+http://<YOUR APP NAME>.herokuapp.com/profile?mode=all&verify_token=<VERIFY_TOKEN>
+```
 
 #### 6. Test that your app setup is successful
 

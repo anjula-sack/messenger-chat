@@ -2,9 +2,10 @@
   "name": "original-coast-clothing",
   "version": "1.0.0",
   "description": "A sample app to show how to build a great Messenger experience!",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js --watch **/*.js --ignore ./node_modules/",
+    "start": "node index.js",
+    "dev": "nodemon --watch index.js",
     "lint": "./node_modules/.bin/eslint ."
   },
   "dependencies": {
@@ -35,6 +36,13 @@
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "nodemon": "^2.0.22",
     "prettier": "^2.7.1"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "./node_modules/"
+    ],
+    "delay": 2500
   }
 }
