@@ -10,12 +10,8 @@
 
 "use strict";
 const axios = require("axios");
-const Curation = require("./curation"),
-  Order = require("./order"),
-  Lead = require("./lead"),
+const Lead = require("./lead"),
   Response = require("./response"),
-  Care = require("./care"),
-  Survey = require("./survey"),
   GraphApi = require("./graph-api"),
   i18n = require("../i18n.config"),
   config = require("./config");
@@ -89,13 +85,6 @@ module.exports = class Receive {
       message.includes("start over")
     ) {
       response = Response.genNuxMessage(this.user);
-    } else if (Number(message)) {
-      response = Order.handlePayload("ORDER_NUMBER");
-    } else if (message.includes("#")) {
-      response = Survey.handlePayload("CSAT_SUGGESTION");
-    } else if (message.includes(i18n.__("care.help").toLowerCase())) {
-      let care = new Care(this.user, this.webhookEvent);
-      response = care.handlePayload("CARE_HELP");
     } else {
       const gptRes = await axios.post(
         "https://api.openai.com/v1/completions",
@@ -224,8 +213,6 @@ module.exports = class Receive {
   }
 
   handlePayload(payload) {
-    console.log("Received Payload:", `${payload} for ${this.user.psid}`);
-
     let response;
 
     // Set the response based on the payload
@@ -235,38 +222,10 @@ module.exports = class Receive {
       payload === "GITHUB"
     ) {
       response = Response.genNuxMessage(this.user);
-    } else if (
-      payload.includes("CURATION") ||
-      payload.includes("COUPON") ||
-      payload.includes("PRODUCT_LAUNCH")
-    ) {
-      let curation = new Curation(this.user, this.webhookEvent);
-      response = curation.handlePayload(payload);
-    } else if (payload.includes("CARE")) {
-      let care = new Care(this.user, this.webhookEvent);
-      response = care.handlePayload(payload);
-    } else if (payload.includes("ORDER")) {
-      response = Order.handlePayload(payload);
-    } else if (payload.includes("CSAT")) {
-      response = Survey.handlePayload(payload);
     } else if (payload.includes("CHAT-PLUGIN")) {
       response = [
         Response.genText(i18n.__("chat_plugin.prompt")),
-        Response.genText(i18n.__("get_started.guidance")),
-        Response.genQuickReply(i18n.__("get_started.help"), [
-          {
-            title: i18n.__("care.order"),
-            payload: "CARE_ORDER"
-          },
-          {
-            title: i18n.__("care.billing"),
-            payload: "CARE_BILLING"
-          },
-          {
-            title: i18n.__("care.other"),
-            payload: "CARE_OTHER"
-          }
-        ])
+        Response.genText(i18n.__("get_started.guidance"))
       ];
     } else if (payload.includes("BOOK_APPOINTMENT")) {
       response = [
@@ -382,11 +341,7 @@ module.exports = class Receive {
   sendRecurringMessage(notificationMessageToken, delay) {
     console.log("Received Recurring Message token");
     let requestBody = {},
-      response,
-      curation;
-    //This example will send summer collection
-    curation = new Curation(this.user, this.webhookEvent);
-    response = curation.handlePayload("CURATION_BUDGET_50_DINNER");
+      response;
     // Check if there is delay in the response
     if (response === undefined) {
       return;

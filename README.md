@@ -1,13 +1,3 @@
-# Original Coast Clothing Messenger Bot
-
-Original Coast Clothing (OC) is a fictional clothing brand created to showcase key features of the Messenger Platform. OC leverages key features to deliver a great customer experience. Using this demo as inspiration, you can create a delightful messaging experience that leverages both automation and live customer support. We are also providing the open source code of the app and a guide to deploy the experience on your local environment or remote server.
-
-[Access the Messenger experience](https://m.me/OriginalCoastClothing?ref=GITHUB)
-
-![Messenger Experience](public/experience.png)
-
-See the [Developer Documentations on this experience](https://developers.facebook.com/docs/messenger-platform/getting-started/sample-apps/original-coast-clothing).
-
 # Setting up your Messenger App
 
 ## Requirements
@@ -136,56 +126,6 @@ Send a message to your Page from Facebook or in Messenger.
 You should see the webhook called in the ngrok terminal tab, and in your application terminal tab.
 
 If you see a response to your message in messenger, you have fully set up your app! Voilà!
-
-## Using Heroku
-
-#### 1. Install the Heroku CLI
-
-Download and install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
-
-#### 2. Create an app from the CLI
-
-```bash
-heroku apps:create
-# Creating app... done, ⬢ mystic-wind-83
-# Created http://mystic-wind-83.herokuapp.com/ | git@heroku.com:mystic-wind-83.git
-```
-
-Note the name given to your app. In this example, it was `mystic-wind-83`.
-
-#### 3. Set your environment variables
-
-On the [Heroku App Dashboard](https://dashboard.heroku.com/), find your app and set up the config vars following the comments in the file `.sample.env`
-
-Alternatively, you can set env variables from the command line like this:
-
-```bash
-heroku config:set PAGE_ID=XXXX
-```
-
-#### 4. Deploy the code
-
-```bash
-git push heroku main
-```
-
-#### 5. View log output
-
-```bash
-heroku logs --tail
-```
-
-#### 6. Configure your webhook subscription and set the Messenger profile
-
-You should now be able to access the application. Use the `VERIFY_TOKEN` that you created as a config var and call the **/profile** endpoint on your app like so:
-
-```
-http://<YOUR APP NAME>.herokuapp.com/profile?mode=all&verify_token=<VERIFY_TOKEN>
-```
-
-#### 6. Test that your app setup is successful
-
-Send a message to your page from Facebook or in Messenger. If your webhook receives an event, you have fully set up your app! Voilà!
 
 ## License
 
