@@ -86,15 +86,19 @@ module.exports = class Receive {
     ) {
       response = Response.genNuxMessage(this.user);
     } else {
-      const gptRes = await axios.post(
-        "https://j6yaybeoidkeflyg4klnxcmbfa0wrpmm.lambda-url.us-east-2.on.aws/generate?session_id=8c4336b5-81a4-461c-b7df-a3b3b272e20b",
-        {
-          user_input: event.message.text
-        }
-      );
+      try {
+        const gptRes = await axios.post(
+          `https://j6yaybeoidkeflyg4klnxcmbfa0wrpmm.lambda-url.us-east-2.on.aws/generate?session_id=${process.env.SESSIONID}`,
+          {
+            user_input: event.message.text
+          }
+        );
 
-      console.log("gptRes", gptRes.data.generated);
-      response = [Response.genText(gptRes.data.generated)];
+        console.log("gptRes", gptRes.data.generated);
+        response = [Response.genText(gptRes.data.generated)];
+      } catch (error) {
+        console.log("API error", error.message);
+      }
     }
     return await response;
   }
