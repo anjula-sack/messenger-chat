@@ -98,8 +98,15 @@ module.exports = class Receive {
         );
 
         console.log("neuraRes: generated", neuraRes.data.generated);
-        console.log("neuraRes", neuraRes.data.questions);
-        response = [Response.genText(neuraRes.data.generated)];
+        const questions = [];
+        neuraRes.data.questions
+          .slice(0, 2)
+          .map((q) => questions.push({ title: q, payload: q }));
+        console.log("neuraRes", questions);
+        response = [
+          Response.genText(neuraRes.data.generated),
+          Response.genQuickReply("Suggestions", questions)
+        ];
       } catch (error) {
         console.log("API error", error.message);
       }
