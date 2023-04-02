@@ -87,26 +87,15 @@ module.exports = class Receive {
       response = Response.genNuxMessage(this.user);
     } else {
       const gptRes = await axios.post(
-        "https://api.openai.com/v1/completions",
+        "https://j6yaybeoidkeflyg4klnxcmbfa0wrpmm.lambda-url.us-east-2.on.aws/generate?session_id=8c4336b5-81a4-461c-b7df-a3b3b272e20b",
         {
-          model: "text-davinci-003",
-          prompt: event.message.text,
-          max_tokens: 50,
-          temperature: 0
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.CHAT_API_TOKEN}`
-          }
+          user_input: event.message.text
         }
       );
 
-      console.log("gptRes", gptRes.data.choices);
-      response = [Response.genText(gptRes.data.choices[0].text)];
+      console.log("gptRes", gptRes.data.generated);
+      response = [Response.genText(gptRes.data.generated)];
     }
-    console.log("====================================");
-    console.log("response", response);
-    console.log("====================================");
     return await response;
   }
 

@@ -37,34 +37,6 @@ module.exports = class Profile {
     GraphApi.callMessengerProfileAPI(profilePayload);
   }
 
-  async setPersonas() {
-    let newPersonas = config.newPersonas;
-
-    let personas = await GraphApi.getPersonaAPI();
-    for (let persona of personas) {
-      config.pushPersona({
-        name: persona.name,
-        id: persona.id
-      });
-    }
-    let existingPersonas = config.personas;
-    console.log({ existingPersonas });
-
-    for (let persona of newPersonas) {
-      if (!(persona.name in existingPersonas)) {
-        let personaId = await GraphApi.postPersonaAPI(
-          persona.name,
-          persona.picture
-        );
-        config.pushPersona({
-          name: persona.name,
-          id: personaId
-        });
-        console.log(config.personas);
-      }
-    }
-  }
-
   setGetStarted() {
     let getStartedPayload = this.getGetStarted();
     GraphApi.callMessengerProfileAPI(getStartedPayload);

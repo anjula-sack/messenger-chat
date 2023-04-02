@@ -70,7 +70,7 @@ app.get("/webhook", (req, res) => {
 app.post("/webhook", (req, res) => {
   let body = req.body;
 
-  console.log(`\u{1F7EA} Received webhook:`);
+  console.log(`\u{1F7EA} Received webhook:`, body);
 
   // Check if this is an event from a page subscription
   if (body.object === "page") {
@@ -240,18 +240,11 @@ app.get("/profile", (req, res) => {
         );
       }
       if (mode == "personas" || mode == "all") {
-        Profile.setPersonas();
         res.write(`<p>&#9989; Set Personas for ${config.appId}</p>`);
         res.write(
           "<p>Note: To persist the personas, add the following variables \
           to your environment variables:</p>"
         );
-        res.write("<ul>");
-        res.write(`<li>PERSONA_BILLING = ${config.personaBilling.id}</li>`);
-        res.write(`<li>PERSONA_CARE = ${config.personaCare.id}</li>`);
-        res.write(`<li>PERSONA_ORDER = ${config.personaOrder.id}</li>`);
-        res.write(`<li>PERSONA_SALES = ${config.personaSales.id}</li>`);
-        res.write("</ul>");
       }
       if (mode == "nlp" || mode == "all") {
         GraphApi.callNLPConfigsAPI();
