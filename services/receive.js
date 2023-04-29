@@ -88,21 +88,19 @@ module.exports = class Receive {
     } else {
       try {
         const session = await axios.get(
-          `https://j6yaybeoidkeflyg4klnxcmbfa0wrpmm.lambda-url.us-east-2.on.aws/create_session?session_id=${this.user.psid}`
+          `${process.env.CHAT_BOT_API}/create_session?session_id=${this.user.psid}`
         );
         const neuraRes = await axios.post(
-          `https://j6yaybeoidkeflyg4klnxcmbfa0wrpmm.lambda-url.us-east-2.on.aws/generate?session_id=${session.data}`,
+          `${process.env.CHAT_BOT_API}/generate?session_id=${session.data}`,
           {
             user_input: event.message.text
           }
         );
 
-        console.log("neuraRes: generated", neuraRes.data.generated);
         const questions = [];
         neuraRes.data.questions
           .slice(0, 2)
           .map((q) => questions.push({ title: q, payload: q }));
-        console.log("neuraRes", questions);
         if (questions.length) {
           response = [
             Response.genText(neuraRes.data.generated),
