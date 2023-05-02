@@ -34,6 +34,13 @@ module.exports = class Receive {
       if (event.message) {
         let message = event.message;
 
+        if (message.attachments) {
+          const userInput = await this.speechToText(
+            message.attachments[0].payload.url
+          );
+          responses = await this.handleSpeechToTextMessage(userInput);
+        }
+
         if (message.text) {
           responses = await this.handleTextMessage();
         }
@@ -63,6 +70,26 @@ module.exports = class Receive {
     } else {
       this.sendMessage(responses, this.isUserRef);
     }
+  }
+
+  async speechToText(filename) {
+    const axiosResponse = await axios.get(filename, {
+      responseType: "arraybuffer"
+    });
+    const data = axiosResponse.data;
+    const response = await axios.post(
+      "https://api-inference.huggingface.co/models/openai/whisper-large",
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUGGINGFACE_TOKEN}`,
+          "Content-Type": "application/octet-stream"
+        }
+      }
+    );
+    const result = response.data;
+    console.log("speechToText", result.text);
+    return result.text;
   }
 
   // Handles messages events with text
@@ -117,6 +144,37 @@ module.exports = class Receive {
       }
     }
     return await response;
+  }
+
+  async handleSpeechToTextMessage(userInput) {
+    let response;
+    try {
+      const session = await axios.get(
+        `${process.env.CHAT_BOT_API}/create_session?session_id=${this.user.psid}`
+      );
+      const neuraRes = await axios.post(
+        `${process.env.CHAT_BOT_API}/generate?session_id=${session.data}`,
+        {
+          user_input: userInput
+        }
+      );
+
+      const questions = [];
+      neuraRes.data.questions
+        .slice(0, 2)
+        .map((q) => questions.push({ title: q, payload: q }));
+      if (questions.length) {
+        response = [
+          Response.genText(neuraRes.data.generated),
+          Response.genQuickReply("Anything else i can help you with", questions)
+        ];
+      } else {
+        response = [Response.genText(neuraRes.data.generated)];
+      }
+    } catch (error) {
+      console.log("API error", error.message);
+    }
+    return response;
   }
 
   // Handles mesage events with attachments
