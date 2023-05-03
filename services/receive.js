@@ -124,21 +124,7 @@ module.exports = class Receive {
           }
         );
 
-        const questions = [];
-        neuraRes.data.questions
-          .slice(0, 2)
-          .map((q) => questions.push({ title: q, payload: q }));
-        if (questions.length) {
-          response = [
-            Response.genText(neuraRes.data.generated),
-            Response.genQuickReply(
-              "Anything else i can help you with",
-              questions
-            )
-          ];
-        } else {
-          response = [Response.genText(neuraRes.data.generated)];
-        }
+        response = [Response.genText(neuraRes.data.generated)];
       } catch (error) {
         console.log("API error", error.message);
       }
@@ -159,18 +145,7 @@ module.exports = class Receive {
         }
       );
 
-      const questions = [];
-      neuraRes.data.questions
-        .slice(0, 2)
-        .map((q) => questions.push({ title: q, payload: q }));
-      if (questions.length) {
-        response = [
-          Response.genText(neuraRes.data.generated),
-          Response.genQuickReply("Anything else i can help you with", questions)
-        ];
-      } else {
-        response = [Response.genText(neuraRes.data.generated)];
-      }
+      response = [Response.genText(neuraRes.data.generated)];
     } catch (error) {
       console.log("API error", error.message);
     }
