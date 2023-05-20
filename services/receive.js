@@ -78,7 +78,7 @@ module.exports = class Receive {
     });
     const data = axiosResponse.data;
     const response = await axios.post(
-      "https://api-inference.huggingface.co/models/openai/whisper-large",
+      `${process.env.SPEECH_TO_TEXT_API}`,
       data,
       {
         headers: {
@@ -88,8 +88,8 @@ module.exports = class Receive {
       }
     );
     const result = response.data;
-    console.log("speechToText", result.text);
-    return result.text;
+    console.log("speechToText", result.generated);
+    return result.generated;
   }
 
   // Handles messages events with text
