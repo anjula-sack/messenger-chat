@@ -10,6 +10,7 @@
 
 "use strict";
 const axios = require("axios");
+const FormData = require("form-data");
 const Lead = require("./lead"),
   Response = require("./response"),
   GraphApi = require("./graph-api"),
@@ -72,24 +73,40 @@ module.exports = class Receive {
     }
   }
 
-  async speechToText(filename) {
-    const axiosResponse = await axios.get(filename, {
-      responseType: "arraybuffer"
-    });
-    const data = axiosResponse.data;
-    const response = await axios.post(
-      `${process.env.SPEECH_TO_TEXT_API}`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.HUGGINGFACE_TOKEN}`,
-          "Content-Type": "application/octet-stream"
+  async speechToText(fileUrl) {
+    try {
+      // Download the file using Axios
+      const fileResponse = await axios.get(fileUrl, {
+        responseType: "arraybuffer"
+      });
+      const fileBuffer = fileResponse.data;
+
+      // Create a new FormData object
+      const formData = new FormData();
+
+      // Append the file buffer to the FormData object
+      formData.append("file", fileBuffer, { filename: "file" });
+
+      // Set the appropriate Content-Type header
+      const headers = formData.getHeaders();
+
+      // Send the FormData as multipart/form-data
+      const response = await axios.post(
+        `${process.env.SPEECH_TO_TEXT_API}`,
+        formData,
+        {
+          headers
         }
-      }
-    );
-    const result = response.data;
-    console.log("speechToText", result.generated);
-    return result.generated;
+      );
+
+      // Handle the response as needed
+      const result = response.data;
+      console.log("speechToText", result.generated);
+      return result.generated;
+    } catch (error) {
+      // Handle any errors
+      console.error(error);
+    }
   }
 
   // Handles messages events with text
