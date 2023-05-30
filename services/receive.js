@@ -134,6 +134,7 @@ module.exports = class Receive {
         const session = await axios.get(
           `${process.env.CHAT_BOT_API}/create_session?session_id=${this.user.psid}`
         );
+
         const neuraRes = await axios.post(
           `${process.env.CHAT_BOT_API}/generate?session_id=${session.data}`,
           {
@@ -141,7 +142,14 @@ module.exports = class Receive {
           }
         );
 
-        response = [Response.genText(neuraRes.data.generated)];
+        if (process.env.DEBUG_MODE) {
+          response = [
+            Response.genText(neuraRes.data.generated),
+            Response.genText("session id: " + session.data)
+          ];
+        } else {
+          response = [Response.genText(neuraRes.data.generated)];
+        }
       } catch (error) {
         console.log("API error", error.message);
       }
@@ -162,7 +170,15 @@ module.exports = class Receive {
         }
       );
 
-      response = [Response.genText(neuraRes.data.generated)];
+      if (process.env.DEBUG_MODE) {
+        response = [
+          Response.genText(neuraRes.data.generated),
+          Response.genText("session id: " + session.data),
+          Response.genText("transcribe: " + userInput)
+        ];
+      } else {
+        response = [Response.genText(neuraRes.data.generated)];
+      }
     } catch (error) {
       console.log("API error", error.message);
     }
