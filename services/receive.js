@@ -142,7 +142,7 @@ module.exports = class Receive {
           }
         );
 
-        if (process.env.DEBUG_MODE) {
+        if (process.env.DEBUG_MODE === "true") {
           response = [
             Response.genText(neuraRes.data.generated),
             Response.genText("session id: " + session.data)
@@ -170,7 +170,7 @@ module.exports = class Receive {
         }
       );
 
-      if (process.env.DEBUG_MODE) {
+      if (process.env.DEBUG_MODE === "true") {
         response = [
           Response.genText(neuraRes.data.generated),
           Response.genText("session id: " + session.data),
