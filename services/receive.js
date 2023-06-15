@@ -34,7 +34,7 @@ module.exports = class Receive {
     try {
       if (event.message) {
         let message = event.message;
-
+        this.sendMessage("typing_on", 0, this.isUserRef, true);
         if (message.attachments) {
           const userInput = await this.speechToText(
             message.attachments[0].payload.url
@@ -355,15 +355,12 @@ module.exports = class Receive {
     GraphApi.callSendApi(requestBody);
   }
 
-  sendMessage(response, delay = 0, isUserRef) {
+  sendMessage(response, delay = 0, isUserRef, isTyping = false) {
     // Check if there is delay in the response
     if (response === undefined || response === null) {
       return;
     }
-    if ("delay" in response) {
-      delay = response["delay"];
-      delete response["delay"];
-    }
+
     // Construct the message body
     let requestBody = {};
     if (isUserRef) {
@@ -374,6 +371,13 @@ module.exports = class Receive {
         },
         message: response
       };
+    } else if (isTyping) {
+      requestBody = {
+        recipient: {
+          id: this.user.psid
+        },
+        sender_action: response
+      };
     } else {
       requestBody = {
         recipient: {
@@ -383,29 +387,6 @@ module.exports = class Receive {
       };
     }
 
-    // Check if there is persona id in the response
-    if ("persona_id" in response) {
-      let persona_id = response["persona_id"];
-      delete response["persona_id"];
-      if (isUserRef) {
-        // For chat plugin
-        requestBody = {
-          recipient: {
-            user_ref: this.user.psid
-          },
-          message: response,
-          persona_id: persona_id
-        };
-      } else {
-        requestBody = {
-          recipient: {
-            id: this.user.psid
-          },
-          message: response,
-          persona_id: persona_id
-        };
-      }
-    }
     // Mitigate restriction on Persona API
     // Persona API does not work for people in EU, until fixed is safer to not use
     delete requestBody["persona_id"];
